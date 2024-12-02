@@ -5,13 +5,13 @@ public class Main {
     final static String ABC = "abcdifghijklmnopqrstuvwxyz";
 
     public static void main(String[] args) {
-        Cat cat = new Cat();
 
 // Subtask 1
         System.out.println("Task1");
 
         int counter = 0;
         while (counter < 10) {
+            Cat cat = new Cat();
             System.out.println(cat.getName() + " " + cat.getAge());
             counter++;
         }
@@ -20,6 +20,7 @@ public class Main {
         System.out.println("\nTask2");
 
         for (int j = 0; j < 10; j++) {
+            Cat cat = new Cat();
             cat.setName(getRandomName());
             cat.setAge(getRandomAge());
 
