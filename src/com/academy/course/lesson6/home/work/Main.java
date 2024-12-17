@@ -1,90 +1,52 @@
 package com.academy.course.lesson6.home.work;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class Main {
 
     final static String ABC = "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm";
+    static int quantityElement = 10;
 
     public static void main(String[] args) {
-        String[][] inputMatrix = new String[10][10];
 
 // Task 1
-    // Заполняем матрицу
-        fillMatrix(inputMatrix);
+        // Заполняем матрицу
+        String[][] inputMatrix = getMatrix(quantityElement);
 
 // Task 2
-    // Сравниваем диагонали матрицы:
-        String resultComparison = comparisonDiagonal(inputMatrix);
+        String[] mainMatrixDiagonalArray = getMainMatrixDiagonalArray(inputMatrix);
+        String[] secondaryMatrixDiagonalArray = getSecondaryMatrixDiagonalArray(inputMatrix);
+        boolean resultComparison = Arrays.equals(mainMatrixDiagonalArray, secondaryMatrixDiagonalArray);
         System.out.println("Результат сравнения диагоналей матрицы: " + resultComparison);
 
-    // Заносим диагонали матрицы в отдельный массив:
-        String[] matrixDiagonalArray = getMatrixDiagonalArray(inputMatrix);
+        String[] matrixDiagonalArray = getMatrixDiagonalArray(mainMatrixDiagonalArray, secondaryMatrixDiagonalArray);
 
-        System.out.println("Массив диагональных элементов матрицы: ");
         for (String elementsMatrixDiagonalArray : matrixDiagonalArray) {
             System.out.print(elementsMatrixDiagonalArray + " ");
         }
         System.out.println();
 
 // Task 3
-    // Поиск и запись в StringBuilder буквенных элементов массива диагоналей матрицы 
-        char dot = '.';
-        int firstStringElement = 1;
-        int doubleElementCount = 0;
-        StringBuilder sumStringResult  = new StringBuilder();
-        
-        for (String arrayElement: matrixDiagonalArray) {
-            char symbol = arrayElement.charAt(firstStringElement);
-            if (symbol != dot) {
-                String stringSlice = arrayElement.substring(1, 5) + ", ";
-                sumStringResult.append(stringSlice);
-            } else doubleElementCount++;
-        }
-        System.out.println("Строка с символьными элементами массива со 2 по 4 элемент: ");
-        System.out.println(sumStringResult);
+        // Поиск и запись в StringBuilder буквенных элементов массива диагоналей матрицы
+        StringBuilder sumStringResult = getStringElementsFromArray(matrixDiagonalArray);
+        System.out.println("Строка с символьными элементами массива со 2 по 4 элемент: " + "\n" + sumStringResult);
 
-    // Поиск, округление и запись в новый массив численных элементов массива диагоналей матрицы
-        int[] resNumberArray = new int[doubleElementCount];
-        int intArrayElement;
-        int numberArrayIndex = 0;
 
-        for (String arrayElement : matrixDiagonalArray) {
-            char symbol = arrayElement.charAt(firstStringElement);
-            if (symbol == dot) {
-                double arrayElementToDouble = Double.parseDouble(arrayElement);
-                if (arrayElementToDouble >= 1.7) {
-                    intArrayElement = 2;
-                } else {
-                    intArrayElement = 1;
-                }
-                resNumberArray[numberArrayIndex] = intArrayElement;
-                numberArrayIndex++;
-            }
-        }
+        // Поиск, округление и запись в новый массив численных элементов массива диагоналей матрицы
+        int[] resNumberArray = getDigitElementsFromArray(matrixDiagonalArray);
 
         System.out.println("Массив с округлёнными числовыми элементами массива диагоналей матрицы: ");
-        for (int i = 0; i < resNumberArray.length; i++) {
-            if (i != resNumberArray.length - 1 ) {
-                System.out.print(resNumberArray[i] + "_");
-            } else {
-                System.out.print(resNumberArray[i]);
-            }
-        }
-        System.out.println();
+        printArray(resNumberArray);
 
 // Task 4
         System.out.println("Матрица: ");
-        for (String[] matrix : inputMatrix) {
-            for (String s : matrix) {
-                System.out.print(s + " ");
-            }
-            System.out.println();
-        }
+        printMatrix(inputMatrix);
     }
-    
+
     // Methods
-    private static void fillMatrix(String[][] matrix) {
+    private static String[][] getMatrix(int quantityElement) {
+        String[][] matrix = new String[quantityElement][quantityElement];
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {
                 if ((i + j + 1) % 3 == 0) {
@@ -94,34 +56,87 @@ public class Main {
                 }
             }
         }
+
+        return matrix;
     }
 
-    private static String comparisonDiagonal(String[][] matrix) {
-        String mainMatrixDiagonal;
-        String secondaryMatrixDiagonal;
-        boolean resultComparison = true;
+    private static String[] getMainMatrixDiagonalArray(String[][] matrix) {
+        String[] mainMatrixDiagonalArray = new String[matrix.length];
         for (int i = 0; i < matrix.length; i++) {
-            mainMatrixDiagonal = matrix[i][i];
-            secondaryMatrixDiagonal = matrix[i][matrix[0].length - i - 1];
-            if (!Objects.equals(mainMatrixDiagonal, secondaryMatrixDiagonal)) {
-                resultComparison = false;
-                break;
+            mainMatrixDiagonalArray[i] = matrix[i][i];
+        }
+
+        return mainMatrixDiagonalArray;
+    }
+
+    private static String[] getSecondaryMatrixDiagonalArray(String[][] matrix) {
+        String[] secondaryMatrixDiagonalArray = new String[matrix.length];
+        for (int i = 0; i < matrix.length; i++) {
+            secondaryMatrixDiagonalArray[i] = matrix[i][matrix[0].length - i - 1];
+        }
+
+        return secondaryMatrixDiagonalArray;
+    }
+
+    private static String[] getMatrixDiagonalArray(String[] firstDiagonalArray, String[] secondDiagonalArray) {
+        String[] resultArray = new String[firstDiagonalArray.length + secondDiagonalArray.length];
+        for (int i = 0; i < resultArray.length; i++) {
+            if (i < firstDiagonalArray.length) {
+                resultArray[i] = firstDiagonalArray[i];
+            } else {
+                resultArray[i] = secondDiagonalArray[i - firstDiagonalArray.length];
             }
         }
-        if (resultComparison) {
-            return "Диагонали равны";
-        } else {
-            return "Диагонали не равны";
-        }
+
+        return resultArray;
     }
 
-    private static String[] getMatrixDiagonalArray(String[][] matrix) {
-        String[] matrixDiagonalArray = new String[matrix.length * 2];
-        for (int i = 0; i < matrix.length; i++) {
-            matrixDiagonalArray[i] = matrix[i][i];
-            matrixDiagonalArray[matrix.length + i] = matrix[i][matrix[0].length - i - 1];
+    private static StringBuilder getStringElementsFromArray(String[] diagonalArray) {
+        char dot = '.';
+        int firstStringElement = 1;
+        StringBuilder stringResult = new StringBuilder();
+
+        for (String arrayElement : diagonalArray) {
+            char symbol = arrayElement.charAt(firstStringElement);
+            if (symbol != dot) {
+                String stringSlice = arrayElement.substring(1, 5) + ", ";
+                stringResult.append(stringSlice);
+            }
         }
-        return matrixDiagonalArray;
+
+        return stringResult;
+    }
+
+    private static int[] getDigitElementsFromArray(String[] diagonalArray) {
+        char dot = '.';
+        int firstStringElement = 1;
+        int doubleElementCount = 0;
+        int intArrayElement;
+        int numberArrayIndex = 0;
+
+        for (String arrayElement : diagonalArray) {
+            char symbol = arrayElement.charAt(firstStringElement);
+            if (symbol == dot) {
+                doubleElementCount++;
+            }
+        }
+
+        int[] resArray = new int[doubleElementCount];
+        for (String arrayElement : diagonalArray) {
+            char symbol = arrayElement.charAt(firstStringElement);
+            if (symbol == dot) {
+                double arrayElementToDouble = Double.parseDouble(arrayElement);
+                if (arrayElementToDouble >= 1.7) {
+                    intArrayElement = 2;
+                } else {
+                    intArrayElement = 1;
+                }
+                resArray[numberArrayIndex] = intArrayElement;
+                numberArrayIndex++;
+            }
+        }
+
+        return resArray;
     }
 
     private static String getRandomString() {
@@ -141,4 +156,23 @@ public class Main {
         return doubleToString.substring(0, 7);
     }
 
+    public static void printArray(int[] array) {
+        for (int i = 0; i < array.length; i++) {
+            if (i != array.length - 1) {
+                System.out.print(array[i] + "_");
+            } else {
+                System.out.print(array[i]);
+            }
+        }
+        System.out.println();
+    }
+
+    public static void printMatrix(String[][] matrix) {
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[0].length; j++) {
+                System.out.print(matrix[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
 }
