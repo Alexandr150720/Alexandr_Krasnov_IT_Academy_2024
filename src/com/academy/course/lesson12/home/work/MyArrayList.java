@@ -5,20 +5,20 @@ import java.util.*;
 public class MyArrayList<T> implements MyList<T> {
 
     private final static int INITIAL_CAPACITY = 10;
-    private Object[] array;
+    private T[] array;
 
     public MyArrayList() {
-        this.array = new Object[INITIAL_CAPACITY];
+        this.array = (T[]) new Object[INITIAL_CAPACITY];
     }
 
-    public MyArrayList(Object[] array) {
+    public MyArrayList(T[] array) {
         this.array = array;
     }
 
     public MyArrayList(int capacity) {
         if (capacity < 1)
             throw new ArrayIndexOutOfBoundsException("Invalid array value");
-        this.array = new Object[capacity];
+        this.array = (T[]) new Object[capacity];
     }
 
     @Override
@@ -38,25 +38,26 @@ public class MyArrayList<T> implements MyList<T> {
     }
 
     @Override
-    public boolean contains(Object var1) {
-        int count = 0;
-        for (Object o : this.array) {
-            if (o.equals(var1)) {
-                count++;
-                break;
+    public boolean contains(T var1) {
+        for (T o: this.array) {
+            if (o == null){
+                return false;
+            }
+            if (o.equals(var1) ) {
+               return true;
             }
         }
-        return count != 0;
+        return false;
     }
 
     @Override
-    public boolean add(Object var1) {
+    public boolean add(T var1) {
         if (this.array[array.length - 1] != null) {
             Object[] newArray = new Object[array.length * 2];
             for (int i = 0; i < this.array.length; i++) {
                 newArray[i] = this.array[i];
             }
-            this.array = newArray;
+            this.array = (T[]) newArray;
         }
         for (int i = 0; i < this.array.length; i++) {
             if (this.array[i] == null) {
@@ -68,7 +69,7 @@ public class MyArrayList<T> implements MyList<T> {
     }
 
     @Override
-    public boolean remove(Object var1) {
+    public boolean remove(T var1) {
         boolean isRemoved = false;
         for (int i = 0; i < this.array.length; i++) {
             if (isRemoved) {
@@ -86,20 +87,13 @@ public class MyArrayList<T> implements MyList<T> {
     }
 
     @Override
-    public boolean addAll(MyList<? extends T> var1) {
-        boolean modified = false;
-        Iterator<T> iterator = var1.iterator();
-        while (iterator.hasNext()) {
-            T element = iterator.next();
-            modified = true;
-            this.add(element);
-        }
-        return modified;
+    public boolean addAll(MyList<? extends T> inputArray) {
+        return addAll(this.size(), inputArray);
     }
 
     @Override
-    public void add(int index, Object obj) {
-        if (index > size() - 1 || index < 0) {
+    public void add(int index, T obj) {
+        if (index > size() || index < 0) {
             throw new ArrayIndexOutOfBoundsException();
         }
         if (this.array[array.length - 1] != null) {
@@ -107,7 +101,7 @@ public class MyArrayList<T> implements MyList<T> {
             for (int i = 0; i < this.array.length; i++) {
                 newArray[i] = this.array[i];
             }
-            this.array = newArray;
+            this.array = (T[]) newArray;
         }
         for (int i = this.array.length - 2; i >= index; i--) {
             this.array[i + 1] = this.array[i];
@@ -116,12 +110,22 @@ public class MyArrayList<T> implements MyList<T> {
     }
 
     @Override
-    public boolean addAll(int index, MyList col) {
-        return false;
+    public boolean addAll(int index, MyList<? extends T> col) {
+        int offset = 0;
+        if (col.isEmpty()){
+            return false;
+        }
+        for (T element: col.toArray()){
+            if (element != null) {
+                this.add(offset + index, element);
+                offset++;
+            }
+        }
+        return true;
     }
 
     @Override
-    public Object get(int index) {
+    public T get(int index) {
         if (index > size() - 1 || index < 0) {
             throw new ArrayIndexOutOfBoundsException();
         }
@@ -129,22 +133,35 @@ public class MyArrayList<T> implements MyList<T> {
     }
 
     @Override
-    public int indexOf(Object obj) {
-
-        return 0;
+    public int indexOf(T obj) {
+        int index = -1;
+        for (int i = 0; i < this.size() - 1; i++) {
+            if (this.array[i] == obj){
+                index = i;
+                break;
+            }
+        }
+        return index;
     }
 
     @Override
-    public int lastIndexOf(Object obj) {
-        return 0;
+    public int lastIndexOf(T obj) {
+        int index = -1;
+        for (int i = this.size() - 1; i > 0; i--) {
+            if (this.array[i] == obj){
+                index = i;
+                break;
+            }
+        }
+        return index;
     }
 
     @Override
-    public Object remove(int index) {
+    public T remove(int index) {
         if (index > size() - 1 || index < 0) {
             throw new ArrayIndexOutOfBoundsException();
         }
-        Object indexObject = this.array[index];
+        T indexObject = this.array[index];
         for (int i = index + 1; i < this.array.length; i++) {
             this.array[i - 1] = this.array[i];
         }
@@ -153,23 +170,40 @@ public class MyArrayList<T> implements MyList<T> {
     }
 
     @Override
-    public Object set(int index, T obj) {
+    public T set(int index, T obj) {
         if (index > size() - 1 || index < 0) {
             throw new ArrayIndexOutOfBoundsException();
         }
-        Object indexObject = this.array[index];
+        T indexObject = this.array[index];
         this.array[index] = obj;
         return indexObject;
     }
 
     @Override
-    public void sort(Comparator comp) {
-
+    public void sort(Comparator<? super T> comp) {
+        for (int i = 0; i < this.size(); i++) {
+            boolean isChanged = false;
+            for (int j = 0; j < this.size() - 1; j++) {
+                if (comp.compare(this.array[j], this.array[j + 1]) > 0){
+                    T element = this.array[j];
+                    this.array[j] = this.array[j + 1];
+                    this.array[j + 1] = element;
+                    isChanged = true;
+                }
+            }
+            if (!isChanged){
+                return;
+            }
+        }
     }
 
     @Override
     public boolean removeAll(MyList<T> col) {
-       return false;
+        boolean isRemoved = false;
+        for (T element: col.toArray()){
+            isRemoved |= this.remove(element);
+        }
+       return isRemoved;
     }
 
     @Override
@@ -183,5 +217,10 @@ public class MyArrayList<T> implements MyList<T> {
             res.append(this.array[i].toString());
         }
         return "[" + res + "]";
+    }
+
+    @Override
+    public T[] toArray(){
+        return this.array;
     }
 }
